@@ -35,8 +35,8 @@ shinyServer(function(input, output) {
   
   #Points By Classification Crosstab
   output$classcrosstab <- renderPlot({
-    KPI_Low_Max_value = 3     
-    KPI_Medium_Max_value = 7
+    KPI_Low_Max_value = input$KPI1     
+    KPI_Medium_Max_value = input$KPI2
     
     
     crosstab <- df %>% 
@@ -80,8 +80,8 @@ shinyServer(function(input, output) {
   
   #Points By Position Crosstab
   output$poscrosstab <- renderPlot({
-    KPI_Low_Max_value = 3     
-    KPI_Medium_Max_value = 7
+    KPI_Low_Max_value = input$KPI1     
+    KPI_Medium_Max_value = input$KPI2
     
     crosstab <- df %>% 
       filter(CONF == "Big 12") %>% 
