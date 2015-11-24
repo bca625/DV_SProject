@@ -63,7 +63,7 @@ img {
 
 <div id="data-visualization-project-6-ncaa-division-i-mens-basketball-statistics-for-the-2014-2015-season" class="section level1">
 <h1>Data Visualization Project 6: NCAA Division I Men’s Basketball Statistics for the 2014-2015 Season</h1>
-<p><strong>Bryan Amaefule, Shannon Lu, Kevin Lee</strong> <a href="https://ba7433.shinyapps.io/DV_SProject">Shiny Application</a></p>
+<p><strong>Bryan Amaefule, Shannon Lu, Kevin Lee</strong><br /> <a href="https://ba7433.shinyapps.io/DV_SProject">Shiny Application</a></p>
 <p>It’s officially November, meaning the start of the college basketball season is just a few weeks away. Last season we saw Duke coach Mike Krzyzewski(yes, that’s really how you spell his name) lead his Blue Devils to their sixteenth Final Four appearance, and their fifth National Championship. We saw the (almost)undefeated Kentucky Wildcats have their dream of a perfect season, and spot in the history books, cut short by Frank Kaminsky and the Wisconsin Badgers. With the drama of the 2015-2016 season on the horizon it was only fitting that we choose a baketball-centric subject for this project. We acquired statistics from the 2014-2015 season of NCAA Division I Men’s Basketball.</p>
 <p>We display and interpret all of our visualizations in an interactive app using the Shiny package in R. The app can be found <a href="https://ba7433.shinyapps.io/DV_SProject">here</a>. We supply the code for our UI and Server scripts in their entirety at the bottom of this page to allow the reader to easily reproduce our application.</p>
 <p><strong>Background Information</strong></p>
@@ -124,6 +124,7 @@ img {
             #position=position_identity()
             position=position_jitter(width=0.3, height=0)
       )</code></pre>
+<p><strong>Blended data</strong><br />Our blended data joins our last seasons college basketball data with data from the current NBA season allowing us to visualize how last seasons NCAA superstars are adjusting to the NBA as rookies. We use an inner join to combine the two data sets and create two box plots</p>
 </div>
 <div id="server-script" class="section level3">
 <h3>Server Script</h3>
@@ -333,7 +334,7 @@ shinyServer(function(input, output) {
     PNN &lt;- df %&gt;% filter(POS != &quot;null&quot;) %&gt;% tbl_df
 
     #Blocks by Position
-    ggplot() + 
+    plot9 &lt;- ggplot() + 
       coord_cartesian() + 
       scale_x_continuous() +
       scale_y_continuous() +
@@ -347,7 +348,54 @@ shinyServer(function(input, output) {
             geom_params=list(), 
             #position=position_identity()
             position=position_jitter(width=0.3, height=0)
-      )    
+      ) 
+    
+    return(plot9)
+  })
+  
+  output$blending1 &lt;- renderPlot({
+    
+    KPI_Low_Max_value = 3     
+    KPI_Medium_Max_value = 7
+    
+    CBB &lt;- data.frame(fromJSON(getURL(URLencode(gsub(&quot;\n&quot;, &quot; &quot;, 'skipper.cs.utexas.edu:5001/rest/native/?query= &quot;select * from CBB;&quot;
+  ')), httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON', p1=KPI_Low_Max_value, p2=KPI_Medium_Max_value), verbose = TRUE)))
+      
+      draft &lt;- data.frame(fromJSON(getURL(URLencode(gsub(&quot;\n&quot;, &quot; &quot;, 'skipper.cs.utexas.edu:5001/rest/native/?query= &quot;select * from draft;&quot;
+                                                         ')), httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON', p1=KPI_Low_Max_value, p2=KPI_Medium_Max_value), verbose = TRUE)))
+      
+      rooks &lt;- right_join(CBB,draft,by='PLAYER')
+      rookies &lt;- rooks %&gt;% mutate(cPPG = PTS.x / G.x) %&gt;% filter(PLAYER != &quot;null&quot;)
+      
+      plot10 &lt;- ggplot(rookies, aes(PLAYER, cPPG, fill=CLASS)) + geom_bar(stat=&quot;identity&quot;) + coord_flip() + ylab(&quot;PPG in College&quot;)
+    
+    
+    
+    return(plot10)
+  })
+  
+  
+  
+  
+  output$blending2 &lt;- renderPlot({
+    
+    KPI_Low_Max_value = 3     
+    KPI_Medium_Max_value = 7
+    
+    CBB &lt;- data.frame(fromJSON(getURL(URLencode(gsub(&quot;\n&quot;, &quot; &quot;, 'skipper.cs.utexas.edu:5001/rest/native/?query= &quot;select * from CBB;&quot;
+                                                     ')), httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON', p1=KPI_Low_Max_value, p2=KPI_Medium_Max_value), verbose = TRUE)))
+    
+    draft &lt;- data.frame(fromJSON(getURL(URLencode(gsub(&quot;\n&quot;, &quot; &quot;, 'skipper.cs.utexas.edu:5001/rest/native/?query= &quot;select * from draft;&quot;
+                                                       ')), httpheader=c(DB='jdbc:oracle:thin:@sayonara.microlab.cs.utexas.edu:1521:orcl', USER='C##cs329e_ba7433', PASS='orcl_ba7433', MODE='native_mode', MODEL='model', returnDimensions = 'False', returnFor = 'JSON', p1=KPI_Low_Max_value, p2=KPI_Medium_Max_value), verbose = TRUE)))
+    
+    rooks &lt;- right_join(CBB,draft,by='PLAYER')
+    rookies &lt;- rooks %&gt;% mutate(cPPG = PTS.x / G.x) %&gt;% filter(PLAYER != &quot;null&quot;)
+  
+    plot11 &lt;- ggplot(rookies, aes(PLAYER, round(as.numeric(as.character(PPG), 2)), fill=CLASS)) + geom_bar(stat=&quot;identity&quot;) + coord_flip() + ylab(&quot;PPG in NBA&quot;)
+    
+    return(plot11)
+    
+    
   })
   
   
@@ -375,7 +423,7 @@ dashboardPage(
                      menuItem(&quot;Rebounds By Position&quot;, tabName = &quot;rebsbypos&quot;, icon = icon(&quot;line-chart&quot;)),
                      menuItem(&quot;Steals By Position&quot;, tabName = &quot;stealsbypos&quot;, icon = icon(&quot;line-chart&quot;)),
                      menuItem(&quot;Blocks By Position&quot;, tabName = &quot;blocksbypos&quot;, icon = icon(&quot;line-chart&quot;)),
-                     menuItem(&quot;Blending&quot;, tabName = &quot;blending&quot;, icon = icon(&quot;link&quot;))
+                     menuItem(&quot;Blended Data: College vs. NBA&quot;, tabName = &quot;blending&quot;, icon = icon(&quot;link&quot;))
                    )
   ),
   dashboardBody(
@@ -453,14 +501,20 @@ dashboardPage(
       tabItem(tabName = &quot;blocksbypos&quot;,
               h4(&quot;Blocks by Position: &quot;),
               plotOutput(&quot;blocksbypos&quot;)
+      ),
+      
+      tabItem(tabName = &quot;blending&quot;,
+              h4(&quot;Blended Data: College Basketball Stars vs. NBA Rookies&quot;),
+              h5(&quot;Every year, around 60 exceptional college basketball players see their dreams come to fruition as they get drafted into the National Basketball Association. These players, who have been the top dogs on evry team they've been on, are thrust into the gaunlet against some of the best athletes in the world. Egos are shattered as high school phenoms and hometown heroes become role-players and bench warmers. To visualize just how these players transition into the pros, we blended our 2014-2015 college basketball data with data from the current NBA season.&quot;),
+              plotOutput(&quot;blending1&quot;),
+              h5(&quot;We are only a few weeks into the current NBA season so the sample size is fairly small. However, we are still able to see the growing pains of many of the new NBA recruits.&quot;),
+              plotOutput(&quot;blending2&quot;)
       )
       
     )
   )
 )
 </code></pre>
-<p><strong>Blending Data: Points per Game in College vs Points per Game in the NBA</strong> Every year, around 60 exceptional college basketball players see their dreams come to fruition as they get drafted into the National Basketball Association. These players, who have been the top dogs on evry team they’ve been on, are thrust into the gaunlet against some of the best athletes in the world. Egos are shattered as high school phenoms and hometown heroes become role-players and bench warmers. To visualize just how these players transition into the pros, we blended our 2014-2015 college basketball data with data from the current NBA season.</p>
-<p>We are only a few weeks into the current NBA season so the sample size is fairly small. However, we are still able to see the growing pains of many of the new NBA recruits.</p>
 </div>
 </div>
 

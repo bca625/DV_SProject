@@ -18,7 +18,7 @@ dashboardPage(
                      menuItem("Rebounds By Position", tabName = "rebsbypos", icon = icon("line-chart")),
                      menuItem("Steals By Position", tabName = "stealsbypos", icon = icon("line-chart")),
                      menuItem("Blocks By Position", tabName = "blocksbypos", icon = icon("line-chart")),
-                     menuItem("Blending", tabName = "blending", icon = icon("link"))
+                     menuItem("Blended Data: College vs. NBA", tabName = "blending", icon = icon("link"))
                    )
   ),
   dashboardBody(
@@ -96,6 +96,14 @@ dashboardPage(
       tabItem(tabName = "blocksbypos",
               h4("Blocks by Position: "),
               plotOutput("blocksbypos")
+      ),
+      
+      tabItem(tabName = "blending",
+              h4("Blended Data: College Basketball Stars vs. NBA Rookies"),
+              h5("Every year, around 60 exceptional college basketball players see their dreams come to fruition as they get drafted into the National Basketball Association. These players, who have been the top dogs on evry team they've been on, are thrust into the gaunlet against some of the best athletes in the world. Egos are shattered as high school phenoms and hometown heroes become role-players and bench warmers. To visualize just how these players transition into the pros, we blended our 2014-2015 college basketball data with data from the current NBA season."),
+              plotOutput("blending1"),
+              h5("We are only a few weeks into the current NBA season so the sample size is fairly small. However, we are still able to see the growing pains of many of the new NBA recruits."),
+              plotOutput("blending2")
       )
       
     )
